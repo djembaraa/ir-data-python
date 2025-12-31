@@ -1,0 +1,6 @@
+streamlit
+supabase
+nltk
+Sastrawi
+scikit-learn
+pandas
