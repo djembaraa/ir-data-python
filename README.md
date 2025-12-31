@@ -37,7 +37,7 @@ Aplikasi "Sistem Temu Balik Informasi" sederhana yang dibangun untuk memenuhi tu
 ##  Instalasi & Menjalankan di Local
 
 ### 1. Clone Repository
-git clone [[https://github.com/USERNAME_KAMU/NAMA_REPO_KAMU.git](https://github.com/djembaraa/ir-data-python.git)]([https://github.com/USERNAME_KAMU/NAMA_REPO_KAMU.git](https://github.com/djembaraa/ir-data-python.git))
+git clone (https://github.com/djembaraa/ir-data-python.git)
 cd ir-data-python
 
 ### 2. Buat Virtual Environment
@@ -61,3 +61,4 @@ key = "MASUKKAN_SUPABASE_ANON_KEY_KAMU"
 
 ### 5. Run Development
 streamlit run app.py
+
