@@ -8,20 +8,17 @@ st.set_page_config(page_title="Search Engine IR", page_icon="✨", layout="cente
 
 st.markdown("""
 <style>
-    /* Import Font Modern */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Menghilangkan padding atas bawaan yang terlalu lebar */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 5rem;
     }
 
-    /* Styling Input Box agar lebih 'Tactile' */
     .stTextInput input {
         border-radius: 12px !important;
         border: 1px solid #E0E0E0;
@@ -35,14 +32,12 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(255, 75, 75, 0.15) !important;
     }
 
-    /* Styling Expander Database */
     .streamlit-expanderHeader {
         background-color: #F8F9FA;
         border-radius: 8px;
         font-size: 0.9rem;
     }
 
-    /* Custom Footer */
     .footer {
         position: fixed;
         bottom: 0;
@@ -58,13 +53,24 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
 @st.cache_resource
 def init_connection():
+    if "supabase" not in st.secrets:
+        st.error("❌ File `.streamlit/secrets.toml` tidak ditemukan atau isinya salah!")
+        st.stop()
+
     try:
         url = st.secrets["supabase"]["url"]
         key = st.secrets["supabase"]["key"]
+        
+        if "\n" in key or " " in key:
+            st.error("❌ ERROR FORMAT KEY: Ada 'Enter' atau 'Spasi' di dalam Key Supabase kamu. Cek file secrets.toml lagi!")
+            st.stop()
+            
         return create_client(url, key)
-    except:
+    except Exception as e:
+        st.error(f"❌ Gagal Inisialisasi Client Supabase: {e}")
         return None
 
 supabase = init_connection()
@@ -77,6 +83,7 @@ def load_data():
         response = supabase.table('documents').select("*").execute()
         return pd.DataFrame(response.data)
     except Exception as e:
+        st.error(f"❌ Error dari Supabase: {e}") 
         return pd.DataFrame()
 
 
@@ -95,7 +102,7 @@ try:
         if not df_docs.empty:
             st.dataframe(df_docs, use_container_width=True)
         else:
-            st.info("Database kosong atau gagal terkoneksi.")
+            st.info("Menunggu data...")
 
     st.divider()
 
@@ -124,7 +131,6 @@ try:
                             st.metric(label="Relevansi", value=f"{int(score_pct)}%")
                         
                         st.markdown(f"<div style='color: #444; line-height: 1.6;'>{row['content']}</div>", unsafe_allow_html=True)
-                        
                         st.progress(row['score'], text=None)
             else:
                 st.container(border=True).markdown("""
@@ -135,7 +141,7 @@ try:
                 </div>
                 """, unsafe_allow_html=True)
     else:
-        st.error("Gagal memuat data dari Supabase. Cek koneksi internet atau API Key.")
+        st.warning("⚠️ Database belum terhubung. Lihat pesan error di atas (kotak merah) untuk detailnya.")
 
 except Exception as e:
     st.error(f"System Error: {e}")
